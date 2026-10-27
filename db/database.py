@@ -1,10 +1,12 @@
 import sqlite3
+from pathlib import Path
 
 
-Database="users.db"
+Database = Path(__file__).resolve().parent.parent / "users.db"
+
 
 def init_db():
-    conn =  sqlite3.connect(Database)
+    conn = sqlite3.connect(Database)
     cursor = conn.cursor()
     cursor.execute(
         """
