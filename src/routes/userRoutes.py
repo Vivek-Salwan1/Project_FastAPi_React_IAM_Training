@@ -8,9 +8,9 @@ import bcrypt
 from fastapi import APIRouter, HTTPException, status
 from jose import jwt
 
-from backend.src.db.database import Database
-from backend.src.models.user import User
-from backend.src.models.user_login import UserLogin
+from src.db.database import Database
+from src.models.user import User
+from src.models.user_login import UserLogin
 
 router = APIRouter()
 

@@ -2,8 +2,8 @@ import sqlite3
 
 from fastapi import APIRouter, HTTPException, status
 
-from backend.src.db.database import Database
-from backend.src.models.product import Product
+from src.db.database import Database
+from src.models.product import Product
 
 router = APIRouter()
 
@@ -29,8 +29,9 @@ def add_product(product: Product):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO products (id, name, price) VALUES (?, ?, ?)",
-            (product.id, product.name, product.price),
+            "INSERT INTO products (id, name, price, category) "
+            "VALUES (?, ?, ?, ?)",
+            (product.id, product.name, product.price, product.category),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -56,8 +57,14 @@ def update_product(product_id: int, updated_product: Product):
             )
 
         cursor.execute(
-            "UPDATE products SET name = ?, price = ? WHERE id = ?",
-            (updated_product.name, updated_product.price, product_id),
+            "UPDATE products SET name = ?, price = ?, category = ? "
+            "WHERE id = ?",
+            (
+                updated_product.name,
+                updated_product.price,
+                updated_product.category,
+                product_id,
+            ),
         )
         conn.commit()
         return updated_product

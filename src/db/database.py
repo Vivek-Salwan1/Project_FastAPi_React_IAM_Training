@@ -2,7 +2,7 @@ import sqlite3
 from pathlib import Path
 
 
-Database = Path(__file__).resolve().parent.parent / "users.db"
+Database = Path(__file__).resolve().parents[2] / "users.db"
 
 
 def init_db():
@@ -13,10 +13,19 @@ def init_db():
         CREATE TABLE IF NOT EXISTS products(
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
-        price TEXT NOT NULL
+        price TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Uncategorized'
         )
         """
     )
+    product_columns = {
+        column[1] for column in cursor.execute("PRAGMA table_info(products)")
+    }
+    if "category" not in product_columns:
+        cursor.execute(
+            "ALTER TABLE products "
+            "ADD COLUMN category TEXT NOT NULL DEFAULT 'Uncategorized'"
+        )
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS users(
