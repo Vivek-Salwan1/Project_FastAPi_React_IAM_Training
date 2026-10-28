@@ -2,20 +2,23 @@ import os
 import secrets
 import sqlite3
 from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
 
 import bcrypt
 from fastapi import APIRouter, HTTPException, status
 from jose import jwt
 
-from db.database import Database
-from models.user import User
-from models.user_login import UserLogin
+from backend.src.db.database import Database
+from backend.src.models.user import User
+from backend.src.models.user_login import UserLogin
 
 router = APIRouter()
 
+load_dotenv()  # Load environment variables from .env file
+
 JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_urlsafe(32))
-JWT_ALGORITHM = "HS256"
-TOKEN_EXPIRATION_MINUTES = 30
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+TOKEN_EXPIRATION_MINUTES = int(os.getenv("TOKEN_EXPIRATION_MINUTES", 30))
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
