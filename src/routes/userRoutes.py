@@ -96,5 +96,10 @@ def user_login(login_credentials: UserLogin):
             "access_token": access_token,
             "token_type": "bearer",
         }
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()

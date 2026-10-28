@@ -19,6 +19,11 @@ def get_products():
         rows = cursor.fetchall()
         products = [dict(row) for row in rows]
         return {"products": products}
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
 
@@ -39,6 +44,11 @@ def add_product(product: Product):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A product with this ID already exists",
         )
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
     return product
@@ -68,6 +78,11 @@ def update_product(product_id: int, updated_product: Product):
         )
         conn.commit()
         return updated_product
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
 
@@ -87,5 +102,10 @@ def delete_product(product_id: int):
         cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
         conn.commit()
         return "successfully deleted"
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
