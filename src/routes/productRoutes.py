@@ -2,8 +2,8 @@ import sqlite3
 
 from fastapi import APIRouter, HTTPException, status
 
-from db.database import Database
-from models.product import Product
+from backend.src.db.database import Database
+from backend.src.models.product import Product
 
 router = APIRouter()
 
