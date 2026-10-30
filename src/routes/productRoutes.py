@@ -2,8 +2,8 @@ import sqlite3
 
 from fastapi import APIRouter, HTTPException, status
 
-from backend.src.db.database import Database
-from backend.src.models.product import Product
+from src.db.database import Database
+from src.models.product import Product
 
 router = APIRouter()
 
@@ -19,6 +19,11 @@ def get_products():
         rows = cursor.fetchall()
         products = [dict(row) for row in rows]
         return {"products": products}
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
 
@@ -29,8 +34,9 @@ def add_product(product: Product):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO products (id, name, price) VALUES (?, ?, ?)",
-            (product.id, product.name, product.price),
+            "INSERT INTO products (id, name, price, category) "
+            "VALUES (?, ?, ?, ?)",
+            (product.id, product.name, product.price, product.category),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -38,6 +44,11 @@ def add_product(product: Product):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A product with this ID already exists",
         )
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
     return product
@@ -56,11 +67,22 @@ def update_product(product_id: int, updated_product: Product):
             )
 
         cursor.execute(
-            "UPDATE products SET name = ?, price = ? WHERE id = ?",
-            (updated_product.name, updated_product.price, product_id),
+            "UPDATE products SET name = ?, price = ?, category = ? "
+            "WHERE id = ?",
+            (
+                updated_product.name,
+                updated_product.price,
+                updated_product.category,
+                product_id,
+            ),
         )
         conn.commit()
         return updated_product
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
 
@@ -80,5 +102,10 @@ def delete_product(product_id: int):
         cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
         conn.commit()
         return "successfully deleted"
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()
