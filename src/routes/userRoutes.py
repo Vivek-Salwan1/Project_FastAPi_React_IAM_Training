@@ -8,9 +8,9 @@ import bcrypt
 from fastapi import APIRouter, HTTPException, status
 from jose import jwt
 
-from backend.src.db.database import Database
-from backend.src.models.user import User
-from backend.src.models.user_login import UserLogin
+from src.db.database import Database
+from src.models.user import User
+from src.models.user_login import UserLogin
 
 router = APIRouter()
 
@@ -96,5 +96,10 @@ def user_login(login_credentials: UserLogin):
             "access_token": access_token,
             "token_type": "bearer",
         }
+    except sqlite3.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error}",
+        ) from error
     finally:
         conn.close()

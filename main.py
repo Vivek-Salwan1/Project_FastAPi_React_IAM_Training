@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from backend.src.db.database import init_db
-from backend.src.routes.allRoutes import router
+from src.db.database import init_db
+from src.routes.allRoutes import router
 
 app = FastAPI()
 app.add_middleware(
